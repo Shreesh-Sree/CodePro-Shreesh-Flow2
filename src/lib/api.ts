@@ -688,6 +688,36 @@ export interface ApiNotification {
   createdAt: string;
 }
 
+// ========== Blogs ==========
+export interface ApiBlog {
+  id: number;
+  user_id: number;
+  title: string;
+  description: string | null;
+  up_vote: number | null;
+  down_vote: number | null;
+  created_at: string | null;
+  is_deleted: boolean | null;
+  user_name: string | null;
+  user_email?: string | null;
+  tags: { id: number; name: string | null }[];
+}
+
+export const blogsApi = {
+  getAdminBlogs: (page: number = 1, limit: number = 10, search?: string, sort_by: "latest" | "oldest" | "most_upvoted" = "latest") => {
+    const q = new URLSearchParams();
+    q.set('page', page.toString());
+    q.set('limit', limit.toString());
+    if (search) q.set('search', search);
+    q.set('sort_by', sort_by);
+    return api<{ success: boolean; data: ApiBlog[]; pagination: { page: number; limit: number; total: number; totalPages: number } }>(`/api/blogs/admin/list?${q.toString()}`);
+  },
+  getBlogById: (id: number) => api<ApiBlog>(`/api/blogs/${id}`),
+  deleteAdminBlog: (id: number) => api<{ success: boolean; message: string }>(`/api/blogs/admin/${id}`, { method: 'DELETE' }),
+  create: (body: { title: string; description: string; tags: string[] }) => api<ApiBlog>('/api/blogs', { method: 'POST', body: JSON.stringify(body) }),
+  update: (id: number, body: { title?: string; description?: string; tags?: string[] }) => api<ApiBlog>(`/api/blogs/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+};
+
 export const notificationsApi = {
   list: () => api<{ notifications: ApiNotification[] }>('/api/notifications'),
 };

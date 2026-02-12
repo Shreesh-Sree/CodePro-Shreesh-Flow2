@@ -26,6 +26,9 @@ import statsRoutes from './routes/stats.routes.ts';
 // --- Auth Routes ---
 app.use('/api/stats', statsRoutes);
 
+import blogRoutes from './modules/blog/blog.routes.ts';
+app.use('/api/blogs', blogRoutes);
+
 // Login
 app.post('/api/auth/login', async (req, res): Promise<any> => {
     const { email, password } = req.body;

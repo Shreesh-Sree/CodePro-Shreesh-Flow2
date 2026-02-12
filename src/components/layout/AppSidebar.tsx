@@ -27,6 +27,7 @@ const navItems: NavItem[] = [
   { title: 'Colleges', path: '/colleges', icon: Buildings, permissions: ['college:read', 'college:create', 'college:update', 'college:delete'] },
   { title: 'Departments', path: '/departments', icon: SquaresFour, permissions: ['department:read', 'department:read_own', 'department:create', 'department:update', 'department:delete'] },
   { title: 'Users', path: '/users', icon: Users, permissions: ['user:read', 'user:create', 'user:update', 'user:delete', 'mentor:read', 'mentor:create', 'mentor:update', 'mentor:delete'] },
+  { title: 'Blogs', path: '/admin/blogs', icon: NotePencil, superAdminOnly: false, permission: undefined }, // Visible to Admin/SuperAdmin handled by component logic below
   { title: 'Students', path: '/students', icon: BookOpen, permissions: ['student:read', 'student:create', 'student:update', 'student:delete', 'student:bulk_create'] },
   { title: 'Placement', path: '/placements', icon: Briefcase, permissions: ['placement:read', 'placement:create', 'placement:update', 'placement:delete'] },
   { title: 'Schedule', path: '/schedule', icon: CalendarCheck, permissions: ['test:create', 'test:schedule'] },
@@ -76,6 +77,7 @@ export function AppSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen 
   }, [location.pathname]);
 
   const filteredNavItems = useMemo(() => navItems.filter(item => {
+    if (item.path === '/admin/blogs') return user?.role === 'ADMIN' || user?.role === 'SUPERADMIN';
     if (item.superAdminOnly) return user?.role === 'SUPERADMIN';
     if (item.studentOnly) return user?.role === 'STUDENT';
     if (item.permissions) return hasAnyPermission(item.permissions);

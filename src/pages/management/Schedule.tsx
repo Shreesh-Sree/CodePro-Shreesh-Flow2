@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { cn, getTargetColor } from '../lib/utils';
+import { cn, getTargetColor } from '@/lib/utils';
 import BallBouncingLoader from '@/components/ui/BallBouncingLoader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -74,25 +74,29 @@ const TargetSelector = ({
           {title}
         </h4>
         <div className="grid grid-cols-1 gap-1 px-2">
-          {items.map((item: any) => (
-            <label
-              key={`${type}-${item.id}`}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/5 cursor-pointer transition-all border border-transparent hover:border-primary/10 group"
-            >
-              <Checkbox
-                checked={isTargetSelected(type, Number(item.id))}
-                onCheckedChange={() => toggleTarget(type, Number(item.id), item.label || item.batchYear || item.name)}
-              />
-              <div className="flex flex-col">
-                <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
-                  {item.label || item.batchYear || item.name}
-                </span>
-                <span className={cn("text-[10px] uppercase font-bold tracking-wider font-mono px-1.5 py-0.5 rounded-sm w-fit mt-1", getTargetColor(type))}>
-                  {type}
-                </span>
-              </div>
-            </label>
-          ))}
+          {items.map((item) => {
+            const label = 'batchYear' in item ? item.batchYear : item.name;
+            const itemId = Number(item.id);
+            return (
+              <label
+                key={`${type}-${item.id}`}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/5 cursor-pointer transition-all border border-transparent hover:border-primary/10 group"
+              >
+                <Checkbox
+                  checked={isTargetSelected(type, itemId)}
+                  onCheckedChange={() => toggleTarget(type, itemId, label)}
+                />
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                    {label}
+                  </span>
+                  <span className={cn("text-[10px] uppercase font-bold tracking-wider font-mono px-1.5 py-0.5 rounded-sm w-fit mt-1", getTargetColor(type))}>
+                    {type}
+                  </span>
+                </div>
+              </label>
+            );
+          })}
         </div>
       </div>
     );
@@ -112,7 +116,7 @@ const TargetSelector = ({
         ].map((filter) => (
           <button
             key={filter.id}
-            onClick={() => setActiveFilter(filter.id as any)}
+            onClick={() => setActiveFilter(filter.id as 'all' | TargetType)}
             className={cn(
               "px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap",
               activeFilter === filter.id
@@ -254,6 +258,9 @@ export default function Schedule() {
   }, [editMode, editTest, step, testType, problems, mcqQuestions]);
 
   const batchIds = targets.filter((t) => t.type === 'batch').map((t) => t.id);
+  // Memoize the batch IDs string to reuse in dependency array
+  const batchIdsString = batchIds.join(',');
+
   useEffect(() => {
     if (batchIds.length === 0) {
       setUsedProblemIds([]);
@@ -272,7 +279,7 @@ export default function Schedule() {
         setUsedProblemIds([]);
         setUsedMcqIds([]);
       });
-  }, [batchIds.join(',')]);
+  }, [batchIdsString, batchIds.length]);
 
   useEffect(() => {
     if (step >= 3 && testType) {
@@ -786,14 +793,17 @@ export default function Schedule() {
                           </button>
                           {isCategoryExpanded('uncategorized') && (
                             <ul className="ml-4 mt-0.5 space-y-0.5 border-l border-muted pl-2">
-                              {((testType === 'CODING' ? problemsByCategory : mcqByCategory).get(null) ?? []).map((item: any) => {
+                              {((testType === 'CODING' ? problemsByCategory : mcqByCategory).get(null) ?? []).map((item) => {
                                 const checked = testType === 'CODING' ? selectedProblemIds.includes(item.id) : selectedMcqIds.includes(item.id);
                                 const used = testType === 'CODING' ? usedProblemIds.includes(item.id) : usedMcqIds.includes(item.id);
+                                // item is either problem or mcq question
+                                const label = 'title' in item ? item.title : item.question;
+
                                 return (
                                   <li key={item.id}>
                                     <label className={`flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm cursor-pointer hover:bg-muted transition-colors ${used ? 'cursor-not-allowed opacity-60' : ''}`}>
-                                      <Checkbox checked={checked} disabled={used} onCheckedChange={() => (used ? undefined : checked ? (testType === 'CODING' ? removeProblem(item.id) : removeMcq(item.id)) : (testType === 'CODING' ? addProblem(item) : addMcq(item)))} />
-                                      <span className="flex-1 truncate">{testType === 'CODING' ? item.title : item.question}</span>
+                                      <Checkbox checked={checked} disabled={used} onCheckedChange={() => (used ? undefined : checked ? (testType === 'CODING' ? removeProblem(item.id) : removeMcq(item.id)) : (testType === 'CODING' ? addProblem(item as any) : addMcq(item as any)))} />
+                                      <span className="flex-1 truncate">{label}</span>
                                       {used && <span className="text-xs text-muted-foreground">(used)</span>}
                                     </label>
                                   </li>
