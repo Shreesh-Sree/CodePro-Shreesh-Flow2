@@ -148,18 +148,19 @@ const App = () => (
                   </ProtectedRoute>
                 } />
                 } />
+              </Route>
 
-                {/* Redirects */}
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              {/* Redirects */}
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-                {/* 404 */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </PermissionProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
+              {/* 404 */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </PermissionProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </TooltipProvider>
+  </ThemeProvider>
   </QueryClientProvider >
 );
 
