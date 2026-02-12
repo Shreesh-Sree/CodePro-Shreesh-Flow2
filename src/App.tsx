@@ -10,30 +10,31 @@ import { MainLayout } from "@/components/layout/MainLayout";
 
 // Pages
 import Login from "@/pages/Login";
-import Unauthorized from "@/pages/Unauthorized";
-import Dashboard from "@/pages/Dashboard";
-import Colleges from "@/pages/Colleges";
-import Departments from "@/pages/Departments";
-import Users from "@/pages/Users";
-import Students from "@/pages/Students";
-import StudentDetail from "@/pages/StudentDetail";
-import Placements from "@/pages/Placements";
-import Analytics from "@/pages/Analytics";
-import Progress from "@/pages/Progress";
-import Roles from "@/pages/Roles";
-import Schedule from "@/pages/Schedule";
-import Tests from "@/pages/Tests";
-import TestAttempt from "@/pages/TestAttempt";
-import TestsManagement from "@/pages/TestsManagement";
-import AddQuestions from "@/pages/AddQuestions";
-import Results from "@/pages/Results";
-import TestResult from "@/pages/TestResult";
-import MyTestResult from "@/pages/MyTestResult";
-import MyResults from "@/pages/MyResults";
+import Unauthorized from "@/pages/shared/Unauthorized";
+import Dashboard from "@/pages/shared/Dashboard";
+import Colleges from "@/pages/management/Colleges";
+import Departments from "@/pages/management/Departments";
+import Users from "@/pages/management/Users";
+import BlogsManagement from "@/pages/management/BlogsManagement";
+import Students from "@/pages/management/Students";
+import StudentDetail from "@/pages/management/StudentDetail";
+import Placements from "@/pages/management/Placements";
+import Analytics from "@/pages/management/Analytics";
+import Progress from "@/pages/shared/Progress";
+import Roles from "@/pages/management/Roles";
+import Schedule from "@/pages/management/Schedule";
+import Tests from "@/pages/shared/Tests";
+import TestAttempt from "@/pages/shared/TestAttempt";
+import TestsManagement from "@/pages/management/TestsManagement";
+import AddQuestions from "@/pages/management/AddQuestions";
+import Results from "@/pages/shared/Results";
+import TestResult from "@/pages/shared/TestResult";
+import MyTestResult from "@/pages/shared/MyTestResult";
+import MyResults from "@/pages/shared/MyResults";
 
-import Notifications from "@/pages/Notifications";
-import FAQ from "@/pages/FAQ";
-import NotFound from "@/pages/NotFound";
+import Notifications from "@/pages/shared/Notifications";
+import FAQ from "@/pages/shared/FAQ";
+import NotFound from "@/pages/shared/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -115,6 +116,12 @@ const App = () => (
                 <Route path="/tests-management" element={
                   <ProtectedRoute permissions={['result:read', 'test:view_results']}>
                     <TestsManagement />
+                  </ProtectedRoute>
+                } />
+                {/* Blog Management Route */}
+                <Route path="/management/blogs" element={
+                  <ProtectedRoute roles={['ADMIN', 'SUPERADMIN']}>
+                    <BlogsManagement />
                   </ProtectedRoute>
                 } />
                 <Route path="/tests" element={<Tests />} />

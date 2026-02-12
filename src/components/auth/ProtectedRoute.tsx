@@ -9,16 +9,19 @@ interface ProtectedRouteProps {
   permission?: Permission;
   permissions?: Permission[];
   role?: Role;
+  roles?: Role[];
   requireAll?: boolean;
 }
 
-export function ProtectedRoute({
-  children,
-  permission,
-  permissions,
-  role: requiredRole,
-  requireAll = false
-}: ProtectedRouteProps) {
+export function ProtectedRoute(props: ProtectedRouteProps) {
+  const {
+    children,
+    permission,
+    permissions,
+    role: requiredRole,
+    roles,
+    requireAll = false
+  } = props;
   const { user, isAuthenticated, isLoading } = useAuth();
   const { hasPermission, hasAnyPermission, hasAllPermissions } = usePermission();
   const location = useLocation();
@@ -41,6 +44,8 @@ export function ProtectedRoute({
   let hasAccess = true;
   if (requiredRole) {
     hasAccess = user?.role === requiredRole;
+  } else if (roles) {
+    hasAccess = roles.includes(user?.role || '');
   } else if (permission) {
     hasAccess = hasPermission(permission);
   } else if (permissions) {
